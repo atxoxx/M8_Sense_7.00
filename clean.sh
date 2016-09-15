@@ -1,1 +1,1 @@
-make clean && make mrproper
+make ARCH=arm  CROSS_COMPILE=../arm-cortex_a15-linux-gnueabihf-linaro_4.9.4-2015.06/bin/arm-cortex_a15-linux-gnueabihf- clean && make ARCH=arm  CROSS_COMPILE=../arm-cortex_a15-linux-gnueabihf-linaro_4.9.4-2015.06/bin/arm-cortex_a15-linux-gnueabihf- mrproper
