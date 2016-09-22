@@ -734,7 +734,6 @@ static void
 irq_thread_check_affinity(struct irq_desc *desc, struct irqaction *action)
 {
 	cpumask_var_t mask;
-	bool valid = true;
 
 	if (!test_and_clear_bit(IRQTF_AFFINITY, &action->thread_flags))
 		return;
@@ -749,18 +748,10 @@ irq_thread_check_affinity(struct irq_desc *desc, struct irqaction *action)
 	}
 
 	raw_spin_lock_irq(&desc->lock);
-	/*
-	 * This code is triggered unconditionally. Check the affinity
-	 * mask pointer. For CPU_MASK_OFFSTACK=n this is optimized out.
-	 */
-	if (desc->irq_data.affinity)
-		cpumask_copy(mask, desc->irq_data.affinity);
-	else
-		valid = false;
+	cpumask_copy(mask, desc->irq_data.affinity);
 	raw_spin_unlock_irq(&desc->lock);
 
-	if (valid)
-		set_cpus_allowed_ptr(current, mask);
+	set_cpus_allowed_ptr(current, mask);
 	free_cpumask_var(mask);
 }
 #else
@@ -930,7 +921,17 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 	 * so we have to be careful not to interfere with a
 	 * running system.
 	 */
-
+	if (new->flags & IRQF_SAMPLE_RANDOM) {
+		/*
+		 * This function might sleep, we want to call it first,
+		 * outside of the atomic block.
+		 * Yes, this might clear the entropy pool if the wrong
+		 * driver is attempted to be loaded, without actually
+		 * installing a new handler, but is this really a problem,
+		 * only the sysadmin is able to do this.
+		 */
+		rand_initialize_irq(irq);
+	}
 
 	/*
 	 * Check whether the interrupt nests into another interrupt
@@ -974,16 +975,6 @@ __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)
 		 */
 		get_task_struct(t);
 		new->thread = t;
-		/*
-		 * Tell the thread to set its affinity. This is
-		 * important for shared interrupt handlers as we do
-		 * not invoke setup_affinity() for the secondary
-		 * handlers as everything is already set up. Even for
-		 * interrupts marked with IRQF_NO_BALANCE this is
-		 * correct as we want the thread to move to the cpu(s)
-		 * on which the requesting code placed the interrupt.
-		 */
-		set_bit(IRQTF_AFFINITY, &new->thread_flags);
 	}
 
 	if (!alloc_cpumask_var(&mask, GFP_KERNEL)) {
