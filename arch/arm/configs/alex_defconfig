@@ -3744,6 +3744,7 @@ CONFIG_CRYPTO_WORKQUEUE=y
 # CONFIG_CRYPTO_CRYPTD is not set
 CONFIG_CRYPTO_AUTHENC=y
 # CONFIG_CRYPTO_TEST is not set
+CONFIG_CRYPTO_ABLK_HELPER=y
 
 #
 # Authenticated Encryption with Associated Data
