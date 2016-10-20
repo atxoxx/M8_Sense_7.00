@@ -3904,3 +3904,9 @@ CONFIG_NLATTR=y
 # CONFIG_CORDIC is not set
 CONFIG_QMI_ENCDEC=y
 # CONFIG_QMI_ENCDEC_DEBUG is not set
+
+#
+# Extra config options
+#
+
+CONFIG_MAKO_HOTPLUG=y
