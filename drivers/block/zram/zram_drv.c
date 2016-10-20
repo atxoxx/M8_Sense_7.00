@@ -38,7 +38,7 @@
 /* Globals */
 static int zram_major;
 static struct zram *zram_devices;
-static const char *default_compressor = "lz4";
+static const char *default_compressor = "lz4hc";
 static const int streams = 4;
 
 /* Module params (documentation at end) */
