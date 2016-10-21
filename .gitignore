@@ -92,3 +92,5 @@ GTAGS
 modules
 stock
 \#*#
+
+arch/arm/configs/alex_special_defconfig
