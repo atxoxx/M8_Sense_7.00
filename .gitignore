@@ -41,6 +41,8 @@ modules.builtin
 /linux
 /vmlinux
 /vmlinuz
+/output/
+/output
 /System.map
 /Module.markers
 /Module.symvers
